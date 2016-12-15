@@ -2,18 +2,18 @@
 
 Copyright Â© 2013 Matt Diamond
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
-documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
-the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and 
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and
 to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of 
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of
 the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO 
-THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF 
-CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO
+THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
@@ -30,7 +30,7 @@ DEALINGS IN THE SOFTWARE.
     } else {
        this.node = this.context.createScriptProcessor(bufferLen, 2, 2);
     }
-   
+
     var worker = new Worker(config.workerPath || WORKER_PATH);
     worker.postMessage({
       command: 'init',
@@ -79,7 +79,7 @@ DEALINGS IN THE SOFTWARE.
 
     this.exportWAV = function(cb, type){
       currCallback = cb || config.callback;
-      type = type || config.type || 'audio/wav';
+      type = type || config.type || 'audio/mp3';
       if (!currCallback) throw new Error('Callback not set');
       worker.postMessage({
         command: 'exportWAV',
@@ -89,7 +89,7 @@ DEALINGS IN THE SOFTWARE.
 
     this.exportMonoWAV = function(cb, type){
       currCallback = cb || config.callback;
-      type = type || config.type || 'audio/wav';
+      type = type || config.type || 'audio/mp3';
       if (!currCallback) throw new Error('Callback not set');
       worker.postMessage({
         command: 'exportMonoWAV',
@@ -111,12 +111,21 @@ DEALINGS IN THE SOFTWARE.
     var link = document.getElementById("save");
     var audioObj = document.getElementById("audio");
     audioObj.src = url;
-    console.log("<Response><Play>"+url+"</Play></Response>");
-    //var sourceObj = document.getElementById("source");
-    //sourceObj.setAttribute('src', url);
+    var dataURI;
+    var reader = new FileReader();
+    reader.onload = function(){
+      // here you'll call what to do with the base64 string result
+      var fileObj = document.getElementById("audio_file");
+      dataURI = this.result;
+      fileObj.value = dataURI;
+      var form = document.getElementById('audio_form');
+      form.submit();
+      console.log(dataURI);
+    };
+    reader.readAsDataURL(blob);
     link.href = url;
-    link.download = filename || 'output.wav';
-    link.trigger('click');
+    link.download = filename || 'output.mp3';
+    // link.click();
   }
 
   window.Recorder = Recorder;
